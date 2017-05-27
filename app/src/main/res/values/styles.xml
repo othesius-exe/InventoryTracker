@@ -8,4 +8,46 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!-- List item styles -->
+    <style name="list_item_style">
+        <item name="android:textSize">@dimen/primary_text_size</item>
+        <item name="android:paddingLeft">@dimen/list_item_padding</item>
+        <item name="android:paddingTop">@dimen/list_item_padding</item>
+        <item name="android:paddingBottom">@dimen/list_item_padding</item>
+        <item name="android:text">@string/item_name</item>
+        <item name="android:textColor">@color/primary_text</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="sub_list_item_style">
+        <item name="android:textSize">@dimen/secondary_text_size</item>
+        <item name="android:paddingLeft">@dimen/list_item_padding</item>
+        <item name="android:paddingTop">@dimen/list_item_padding</item>
+        <item name="android:paddingBottom">@dimen/list_item_padding</item>
+        <item name="android:text">@string/stock_information</item>
+        <item name="android:textColor">@color/secondary_text</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <!-- Empty Text View Styles -->
+    <style name="empty_text_style">
+        <item name="android:textSize">@dimen/primary_text_size</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/primary_text</item>
+        <item name="android:text">@string/empty_inventory</item>
+        <item name="android:paddingTop">@dimen/empty_view_padding</item>
+        <item name="android:paddingBottom">@dimen/empty_view_padding</item>
+    </style>
+
+    <style name="empty_subtext_style">
+        <item name="android:textSize">@dimen/secondary_text_size</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/secondary_text</item>
+        <item name="android:text">@string/empty_inventory_hint</item>
+        <item name="android:paddingTop">@dimen/empty_view_padding</item>
+        <item name="android:paddingBottom">@dimen/empty_view_padding</item>
+    </style>
+
 </resources>

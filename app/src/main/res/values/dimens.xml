@@ -1,2 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+
+<resources>
+    <!-- Text View Dimensions -->
+    <dimen name="list_item_height">16dp</dimen>
+
+    <!-- Text Dimensions -->
+    <dimen name="primary_text_size">16sp</dimen>
+    <dimen name="secondary_text_size">14sp</dimen>
+
+    <!-- Padding -->
+    <dimen name="empty_view_padding">8dp</dimen>
+    <dimen name="list_item_padding">8dp</dimen>
+
+    <!-- Fab Margin -->
+    <dimen name="fab_margin">16dp</dimen>
+</resources>

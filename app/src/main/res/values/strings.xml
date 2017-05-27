@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Inventory Tracker</string>
+
+    <!-- Empty View Text -->
+    <string name="empty_inventory">Nothing in Inventory</string>
+    <string name="empty_inventory_hint">Try Ordering Some Items</string>
+
+    <!-- List Item Placeholder Text -->
+    <string name="item_name">Item Name</string>
+    <string name="stock_information">In Stock: </string>
+
+
 </resources>

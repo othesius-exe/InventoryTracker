@@ -9,5 +9,11 @@
     <string name="item_name">Item Name</string>
     <string name="stock_information">In Stock: </string>
 
+    <!-- Menu Item Strings -->
+    <string name="insert_test">Insert Test Data</string>
+    <string name="delete_all">Delete All Data</string>
+    <string name="save_item">Save Item</string>
+    <string name="delete_item">Delete Item</string>
+
 
 </resources>

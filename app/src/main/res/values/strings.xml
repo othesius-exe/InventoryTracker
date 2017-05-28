@@ -15,5 +15,13 @@
     <string name="save_item">Save Item</string>
     <string name="delete_item">Delete Item</string>
 
+    <!-- Detail Page Strings -->
+    <string name="edit_item_title">Edit Inventory Item</string>
+    <string name="create_item_title">Create New Inventory Item</string>
+    <string name="quantity_hint">Number in Stock:</string>
+    <string name="add_stock">Accept Shipment</string>
+    <string name="remove_stock">Sell</string>
+    <string name="quanitity">0</string>
+    <string name="description">Item Description</string>
 
 </resources>

@@ -50,4 +50,15 @@
         <item name="android:paddingBottom">@dimen/empty_view_padding</item>
     </style>
 
+    <!-- Details page styles -->
+    <style name="detail_textview_style">
+        <item name="android:layout_height">@dimen/editor_textview_height</item>
+        <item name="android:paddingTop">@dimen/editor_textview_top_bottom_padding</item>
+        <item name="android:paddingBottom">@dimen/editor_textview_top_bottom_padding</item>
+        <item name="android:paddingLeft">@dimen/editor_textview_side_padding</item>
+        <item name="android:textSize">@dimen/primary_text_size</item>
+        <item name="android:textColor">@color/primary_text</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
 </resources>

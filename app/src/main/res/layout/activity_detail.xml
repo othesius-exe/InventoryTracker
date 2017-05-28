@@ -1,6 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+
+        <TextView
+            style="@style/detail_textview_style"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/editor_textview_height"
+            android:id="@+id/item_name"
+            android:text="@string/item_name"/>
+
+        <TextView
+            style="@style/detail_textview_style"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/editor_textview_height"
+            android:id="@+id/item_quantity"
+            android:text="@string/quantity_hint"/>
+
+        <TextView
+            style="@style/detail_textview_style"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/editor_textview_height"
+            android:text="@string/add_stock"/>
+
+        <TextView
+            style="@style/detail_textview_style"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/editor_textview_height"
+            android:text="@string/remove_stock"/>
+
+        <TextView
+            style="@style/detail_textview_style"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/editor_textview_height"
+            android:id="@+id/item_description"
+            android:text="@string/description"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/editor_textview_height"
+            android:hint="@string/item_name"
+            android:id="@+id/item_name_edit_text"
+            android:inputType="text"/>
+
+        <TextView
+            style="@style/detail_textview_style"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/editor_textview_height"
+            android:id="@+id/in_stock_text_view"
+            android:text="@string/quanitity" />
+
+        <EditText
+            style="@style/detail_textview_style"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/editor_textview_height"
+            android:hint="@string/quanitity"
+            android:id="@+id/add_stock_edit_text"
+            android:inputType="number"/>
+
+        <EditText
+            style="@style/detail_textview_style"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/editor_textview_height"
+            android:hint="@string/quanitity"
+            android:id="@+id/remove_stock_edit_text"
+            android:inputType="number"/>
+
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/editor_textview_height"
+            android:paddingRight="@dimen/spinner_padding"
+            android:spinnerMode="dropdown">
+
+        </Spinner>
+
+    </LinearLayout>
+
+
 
 </LinearLayout>

@@ -1,2 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <!-- Options displayed in the item description spinner -->
+    <string-array name="item_descriptors_array">
+        <item>@string/electronics</item>
+        <item>@string/entertainment</item>
+        <item>@string/health_beauty</item>
+        <item>@string/housewares</item>
+        <item>@string/consumable</item>
+    </string-array>
+</resources>

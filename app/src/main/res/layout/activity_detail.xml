@@ -85,6 +85,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/editor_textview_height"
             android:paddingRight="@dimen/spinner_padding"
+            android:id="@+id/item_description_spinner"
             android:spinnerMode="dropdown">
 
         </Spinner>

@@ -24,4 +24,10 @@
     <string name="quanitity">0</string>
     <string name="description">Item Description</string>
 
+    <!-- Spinner Strings -->
+    <string name="consumable">Food/Beverages</string>
+    <string name="electronics">Electronics</string>
+    <string name="health_beauty">Health/Beauty</string>
+    <string name="housewares">Housewares</string>
+    <string name="entertainment">Movies/Music</string>
 </resources>

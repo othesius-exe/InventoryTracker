@@ -79,6 +79,8 @@ public class DetailActivity extends AppCompatActivity
             invalidateOptionsMenu();
         } else {
             setTitle(R.string.edit_item);
+
+            getLoaderManager().initLoader(EXISTING_ITEM_LOADER, null, this);
         }
 
         // Edit Text for inputting item name

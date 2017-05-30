@@ -24,6 +24,10 @@
                 android:value=".InventoryCatalog">
             </meta-data>
         </activity>
+        <provider
+            android:name=".data.InventoryProvider"
+            android:authorities="com.example.android.inventorytracker"
+            android:exported="false"/>
     </application>
 
 </manifest>

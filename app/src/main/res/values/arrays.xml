@@ -2,10 +2,12 @@
 <resources>
     <!-- Options displayed in the item description spinner -->
     <string-array name="item_descriptors_array">
+        <item>@string/unknown</item>
         <item>@string/electronics</item>
         <item>@string/entertainment</item>
         <item>@string/health_beauty</item>
         <item>@string/housewares</item>
         <item>@string/consumable</item>
+        <item>@string/clothing</item>
     </string-array>
 </resources>

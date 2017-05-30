@@ -25,9 +25,11 @@
     <string name="description">Item Description</string>
 
     <!-- Spinner Strings -->
+    <string name="unknown">Unknown</string>
     <string name="consumable">Food/Beverages</string>
     <string name="electronics">Electronics</string>
     <string name="health_beauty">Health/Beauty</string>
     <string name="housewares">Housewares</string>
     <string name="entertainment">Movies/Music</string>
+    <string name="clothing">Clothing</string>
 </resources>

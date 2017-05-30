@@ -116,6 +116,12 @@ public class InventoryProvider extends ContentProvider {
             throw new IllegalArgumentException("Description must be selected");
         }
 
+        // Check for a price
+         Float price = contentValues.getAsFloat(InventoryEntry.COLUMN_ITEM_PRICE);
+            if (price == null) {
+                throw new IllegalArgumentException("Price must be included");
+            }
+
         // Check that a quantity has been included
         Integer quantity = contentValues.getAsInteger(InventoryEntry.COLUMN_ITEM_QUANITITY);
         if (quantity != null && quantity < 0) {
@@ -176,6 +182,14 @@ public class InventoryProvider extends ContentProvider {
             Integer description = contentValues.getAsInteger(InventoryEntry.COLUMN_ITEM_DESCRIPTION);
             if (description == null || !InventoryEntry.isValidDescription(description)) {
                 throw new IllegalArgumentException("Description must be selected");
+            }
+        }
+
+        // Check for a price
+        if (contentValues.containsKey(InventoryEntry.COLUMN_ITEM_PRICE)) {
+            Float price = contentValues.getAsFloat(InventoryEntry.COLUMN_ITEM_PRICE);
+            if (price == null) {
+                throw new IllegalArgumentException("Price must be included");
             }
         }
 

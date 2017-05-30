@@ -52,6 +52,10 @@ public class InventoryContract {
         // Type: Integer
         public static final String COLUMN_ITEM_DESCRIPTION = "description";
 
+        // Item price
+        // Type: Integer
+        public static final String COLUMN_ITEM_PRICE = "price";
+
         // Quantity in stock
         // Type: Integer
         public static final String COLUMN_ITEM_QUANITITY = "quantity";

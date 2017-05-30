@@ -1,97 +1,138 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="0dp"
+        android:id="@+id/info_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1">
+        android:orientation="horizontal">
 
-        <TextView
-            style="@style/detail_textview_style"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/editor_textview_height"
-            android:id="@+id/item_name"
-            android:text="@string/item_name"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <TextView
-            style="@style/detail_textview_style"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/editor_textview_height"
-            android:id="@+id/item_quantity"
-            android:text="@string/quantity_hint"/>
+            <TextView
+                style="@style/detail_textview_style"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/editor_textview_height"
+                android:text="@string/item_name" />
 
-        <TextView
-            style="@style/detail_textview_style"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/editor_textview_height"
-            android:text="@string/add_stock"/>
 
-        <TextView
-            style="@style/detail_textview_style"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/editor_textview_height"
-            android:text="@string/remove_stock"/>
+            <TextView
+                android:id="@+id/item_description"
+                style="@style/detail_textview_style"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/editor_textview_height"
+                android:text="@string/description" />
 
-        <TextView
-            style="@style/detail_textview_style"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/editor_textview_height"
-            android:id="@+id/item_description"
-            android:text="@string/description"/>
+            <TextView
+                android:id="@+id/item_quantity"
+                style="@style/detail_textview_style"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/editor_textview_height"
+                android:text="@string/quantity_hint" />
+
+            <TextView
+                android:id="@+id/price"
+                style="@style/detail_textview_style"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/editor_textview_height"
+                android:text="@string/price" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/item_name_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/editor_textview_height"
+                android:hint="@string/item_name"
+                android:inputType="text" />
+
+
+            <Spinner
+                android:id="@+id/item_description_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/editor_textview_height"
+                android:paddingRight="@dimen/spinner_padding"
+                android:spinnerMode="dropdown">
+
+            </Spinner>
+
+            <EditText
+                android:id="@+id/in_stock_edit_text"
+                style="@style/detail_textview_style"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/editor_textview_height"
+                android:hint="@string/in_stock" />
+
+            <EditText
+                android:id="@+id/price_edit_text"
+                style="@style/detail_textview_style"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/editor_textview_height"
+                android:hint="@string/unit_price"
+                android:inputType="numberDecimal" />
+        </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1">
+        android:layout_below="@+id/info_layout"
+        android:orientation="horizontal">
 
-        <EditText
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/editor_textview_height"
-            android:hint="@string/item_name"
-            android:id="@+id/item_name_edit_text"
-            android:inputType="text"/>
+            android:layout_height="match_parent">
 
-        <TextView
-            style="@style/detail_textview_style"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/editor_textview_height"
-            android:id="@+id/in_stock_text_view"
-            android:text="@string/quanitity" />
+            <TextView
+                android:id="@+id/sell_receive_text_view"
+                style="@style/detail_textview_style"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/editor_textview_height"
+                android:text="@string/change_quantity" />
 
-        <EditText
-            style="@style/detail_textview_style"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/editor_textview_height"
-            android:hint="@string/quanitity"
-            android:id="@+id/add_stock_edit_text"
-            android:inputType="number"/>
 
-        <EditText
-            style="@style/detail_textview_style"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/editor_textview_height"
-            android:hint="@string/quanitity"
-            android:id="@+id/remove_stock_edit_text"
-            android:inputType="number"/>
+            <EditText
+                android:id="@+id/buy_sell_edit_text"
+                style="@style/detail_textview_style"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/editor_textview_height"
+                android:layout_below="@+id/sell_receive_text_view"
+                android:hint="@string/num_to_change"
+                android:inputType="number" />
 
-        <Spinner
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/editor_textview_height"
-            android:paddingRight="@dimen/spinner_padding"
-            android:id="@+id/item_description_spinner"
-            android:spinnerMode="dropdown">
 
-        </Spinner>
+            <Button
+                android:id="@+id/make_sale_button"
+                android:layout_below="@+id/buy_sell_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/editor_textview_height"
+                android:backgroundTint="@color/colorAccent"
+                android:text="@string/sale_button" />
+
+            <Button
+                android:layout_below="@+id/make_sale_button"
+                android:id="@+id/place_order_button"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/editor_textview_height"
+                android:backgroundTint="@color/colorAccent"
+                android:text="@string/order_button" />
+
+        </RelativeLayout>
+
 
     </LinearLayout>
 
 
-
-</LinearLayout>
+</RelativeLayout>

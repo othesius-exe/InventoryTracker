@@ -2,7 +2,8 @@
 
 <resources>
     <!-- Text View Dimensions -->
-    <dimen name="list_item_height">16dp</dimen>
+    <dimen name="list_item_height">48dp</dimen>
+    <dimen name="sub_item_height">36dp</dimen>
     <dimen name="editor_textview_top_bottom_padding">12dp</dimen>
     <dimen name="editor_textview_side_padding">12dp</dimen>
     <dimen name="editor_textview_height">48dp</dimen>

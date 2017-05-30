@@ -4,12 +4,15 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/item_name_view"
         style="@style/list_item_style"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="@dimen/list_item_height" />
+
     <TextView
+        android:id="@+id/item_description_view"
         style="@style/sub_list_item_style"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="@dimen/sub_item_height" />
 
 </LinearLayout>

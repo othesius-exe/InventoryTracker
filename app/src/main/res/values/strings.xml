@@ -5,10 +5,6 @@
     <string name="empty_inventory">Nothing in Inventory</string>
     <string name="empty_inventory_hint">Try Ordering Some Items</string>
 
-    <!-- List Item Placeholder Text -->
-    <string name="item_name">Item Name</string>
-    <string name="stock_information">In Stock: </string>
-
     <!-- Menu Item Strings -->
     <string name="insert_test">Insert Test Data</string>
     <string name="delete_all">Delete All Data</string>
@@ -16,13 +12,29 @@
     <string name="delete_item">Delete Item</string>
 
     <!-- Detail Page Strings -->
-    <string name="edit_item_title">Edit Inventory Item</string>
-    <string name="create_item_title">Create New Inventory Item</string>
-    <string name="quantity_hint">Number in Stock:</string>
-    <string name="add_stock">Accept Shipment</string>
+    <!-- DetailActivity title Strings -->
+    <string name="edit_item">Edit Inventory Item</string>
+    <string name="create_new_item">Add New Item</string>
+
+    <!-- Button labels -->
+    <string name="order_button">Place Order</string>
+    <string name="sale_button">Make Sale</string>
     <string name="remove_stock">Sell</string>
-    <string name="quanitity">0</string>
+    <string name="order">Order More</string>
+
+    <!-- Item Name Info Strings -->
+    <string name="item_name">Item Name</string>
     <string name="description">Item Description</string>
+
+    <!-- Quantity info Strings -->
+    <string name="quantity_hint">Number in Stock:</string>
+    <string name="change_quantity">Sell/Receive</string>
+    <string name="in_stock">0</string>
+    <string name="num_to_change">Quantity</string>
+    <string name="unit_price">0.00</string>
+
+    <!-- Price String -->
+    <string name="price">Unit Price</string>
 
     <!-- Spinner Strings -->
     <string name="unknown">Unknown</string>
@@ -32,4 +44,19 @@
     <string name="housewares">Housewares</string>
     <string name="entertainment">Movies/Music</string>
     <string name="clothing">Clothing</string>
+
+    <!-- Notification strings -->
+    <string name="error_making_item">Error saving new item</string>
+    <string name="item_saved">Item Saved</string>
+    <string name="update_error">Error updating item</string>
+    <string name="update_successful">Update Successful</string>
+    <string name="keep_editing">Keep Editing</string>
+    <string name="unsaved_changes_dialog_msg">Discard your changes and quit editing?</string>
+    <string name="discard">Discard</string>
+    <string name="delete_dialog_msg">Delete this pet?</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="deletion_successful">Item successfully deleted</string>
+    <string name="deletion_failed">Error deleting item</string>
+
 </resources>

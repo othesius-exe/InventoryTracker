@@ -58,7 +58,7 @@ public class InventoryContract {
 
         // Quantity in stock
         // Type: Integer
-        public static final String COLUMN_ITEM_QUANITITY = "quantity";
+        public static final String COLUMN_ITEM_QUANTITY = "quantity";
 
         // Possible values for the description, listed in the spinner dropdown
         public static final int UNKNOWN = 0;

@@ -123,18 +123,17 @@ public class InventoryProvider extends ContentProvider {
         } catch (NumberFormatException e) {
             Log.i("", price + " is not a number");
         }
-            if (price == null) {
-                throw new IllegalArgumentException("Price must be included");
-            }
+        if (price == null) {
+            throw new IllegalArgumentException("Price must be included");
+        }
 
         // Check that a quantity has been included
         Integer quantity = 0;
         try {
-            quantity = contentValues.getAsInteger(InventoryEntry.COLUMN_ITEM_QUANITITY);
+            quantity = contentValues.getAsInteger(InventoryEntry.COLUMN_ITEM_QUANTITY);
         } catch (NumberFormatException e) {
             Log.i("", quantity + " is not a number");
         }
-
         if (quantity != null && quantity < 0) {
             throw new IllegalArgumentException("Quanity requires a valid number");
         }
@@ -198,15 +197,15 @@ public class InventoryProvider extends ContentProvider {
 
         // Check for a price
         if (contentValues.containsKey(InventoryEntry.COLUMN_ITEM_PRICE)) {
-            Float price = contentValues.getAsFloat(InventoryEntry.COLUMN_ITEM_PRICE);
-            if (price == null) {
+            Double price = contentValues.getAsDouble(InventoryEntry.COLUMN_ITEM_PRICE);
+            if (price != null && price < 0) {
                 throw new IllegalArgumentException("Price must be included");
             }
         }
 
         // Check for a quantity
-        if (contentValues.containsKey(InventoryEntry.COLUMN_ITEM_QUANITITY)) {
-            Integer quantity = contentValues.getAsInteger(InventoryEntry.COLUMN_ITEM_QUANITITY);
+        if (contentValues.containsKey(InventoryEntry.COLUMN_ITEM_QUANTITY)) {
+            Integer quantity = contentValues.getAsInteger(InventoryEntry.COLUMN_ITEM_QUANTITY);
             if (quantity != null && quantity < 0) {
                 throw new IllegalArgumentException("Item requires valid quantity");
             }

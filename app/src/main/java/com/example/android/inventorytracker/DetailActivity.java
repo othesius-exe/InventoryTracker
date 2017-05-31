@@ -214,14 +214,20 @@ public class DetailActivity extends AppCompatActivity
         ContentValues values = new ContentValues();
         values.put(InventoryEntry.COLUMN_ITEM_NAME, name);
         values.put(InventoryEntry.COLUMN_ITEM_DESCRIPTION, mDescription);
-        values.put(InventoryEntry.COLUMN_ITEM_PRICE, unitPrice);
+
+        // If a price is not included, set to 0
+        Double price = 0.00;
+        if (!TextUtils.isEmpty(unitPrice)) {
+            price = Double.parseDouble(unitPrice);
+        }
+        values.put(InventoryEntry.COLUMN_ITEM_PRICE, price);
 
         // If a quantity is not provided, set to 0
         int stock = 0;
         if (!TextUtils.isEmpty(inStock)) {
             stock = Integer.parseInt(inStock);
         }
-        values.put(InventoryEntry.COLUMN_ITEM_QUANITITY, stock);
+        values.put(InventoryEntry.COLUMN_ITEM_QUANTITY, stock);
 
         // Determine if this is a new or existing item
         if (mCurrentItemUri == null) {
@@ -317,7 +323,7 @@ public class DetailActivity extends AppCompatActivity
                 InventoryEntry._ID,
                 InventoryEntry.COLUMN_ITEM_NAME,
                 InventoryEntry.COLUMN_ITEM_DESCRIPTION,
-                InventoryEntry.COLUMN_ITEM_QUANITITY,
+                InventoryEntry.COLUMN_ITEM_QUANTITY,
                 InventoryEntry.COLUMN_ITEM_PRICE };
 
         return new CursorLoader(this,   // Parent activity context
@@ -342,7 +348,7 @@ public class DetailActivity extends AppCompatActivity
             int nameColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_NAME);
             int descColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_DESCRIPTION);
             int priceColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_PRICE);
-            int quantityColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_QUANITITY);
+            int quantityColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_QUANTITY);
 
             // Extract out the value from the Cursor for the given column index
             String name = cursor.getString(nameColumnIndex);

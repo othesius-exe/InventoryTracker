@@ -29,18 +29,22 @@ public class InventoryCursorAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         // Find the views in the list_item file that will house the information
         TextView nameView = (TextView) view.findViewById(R.id.item_name_view);
-        TextView descriptView = (TextView) view.findViewById(R.id.item_description_view);
+        TextView quantityView = (TextView) view.findViewById(R.id.item_quantity_view);
+        TextView priceView = (TextView) view.findViewById(R.id.item_price_view);
 
         // Get the columns of the item attributes to display
         int nameColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_NAME);
-        int descColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_DESCRIPTION);
+        int quantityColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_QUANITITY);
+        int priceColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_PRICE);
 
         // Read the attributes from the cursor
         String itemName = cursor.getString(nameColumnIndex);
-        String itemDesc = cursor.getString(descColumnIndex);
+        String itemQuantity = cursor.getString(quantityColumnIndex);
+        String itemPrice = cursor.getString(priceColumnIndex);
 
         nameView.setText(itemName);
-        descriptView.setText(itemDesc);
+        quantityView.setText(itemQuantity);
+        priceView.setText(itemPrice);
 
     }
 }

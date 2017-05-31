@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -104,8 +105,56 @@ public class DetailActivity extends AppCompatActivity
         mDescriptionSpinner.setOnTouchListener(mTouchListener);
 
         setupSpinner();
+
+        mBuyStockButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent placeOrder = new Intent(Intent.ACTION_SENDTO);
+                placeOrder.setData(Uri.parse("mailto:"));
+                placeOrder.putExtra(Intent.EXTRA_EMAIL, getString(R.string.supplier_email));
+                placeOrder.putExtra(Intent.EXTRA_SUBJECT, mItemEditText.toString());
+
+                if (placeOrder.resolveActivity(getPackageManager()) != null) {
+                    startActivity(placeOrder);
+                }
+            }
+        });
+
+        mSellStockButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sellStock();
+            }
+        });
     }
 
+    /**
+     * Helper Method for making a sale
+     */
+    public void sellStock() {
+
+        String saleInput = mBuySellEditText.getText().toString();
+        String currentStock = mInStockEditText.getText().toString();
+        int numToSell = 0;
+        int stockInt = 0;
+        try {
+            numToSell = Integer.parseInt(saleInput);
+            stockInt = Integer.parseInt(currentStock);
+            Log.i("", numToSell + " is a number");
+            Log.i("", stockInt + " is a number");
+        } catch (NumberFormatException e) {
+            Log.i("", numToSell + " is not a number");
+            Log.i("", stockInt + " is not a number");
+        }
+
+        int afterSaleStock;
+        String afterSaleStockString;
+        if (numToSell > 0 && stockInt - numToSell >= 0) {
+            afterSaleStock = stockInt - numToSell;
+            afterSaleStockString = Integer.toString(afterSaleStock);
+            mInStockEditText.setText(afterSaleStockString);
+        }
+    }
     /**
      * Setup the spinner
      */
@@ -304,7 +353,7 @@ public class DetailActivity extends AppCompatActivity
             // Update the views on the screen with the values from the database
             mItemEditText.setText(name);
             mPriceEditText.setText(String.format("%.2f", price));
-            mInStockEditText.setText(quantity);
+            mInStockEditText.setText(Integer.toString(quantity));
 
             // Description is a dropdown spinner, so map the constant value from the database
             // Then call setSelection() so that option is displayed on screen as the current selection.

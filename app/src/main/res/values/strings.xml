@@ -19,7 +19,6 @@
     <!-- Button labels -->
     <string name="order_button">Place Order</string>
     <string name="sale_button">Make Sale</string>
-    <string name="remove_stock">Sell</string>
     <string name="order">Order More</string>
 
     <!-- Item Name Info Strings -->
@@ -28,7 +27,7 @@
 
     <!-- Quantity info Strings -->
     <string name="quantity_hint">Number in Stock:</string>
-    <string name="change_quantity">Sell/Receive</string>
+    <string name="change_quantity">Sell</string>
     <string name="in_stock">0</string>
     <string name="num_to_change">Quantity</string>
     <string name="unit_price">0.00</string>
@@ -53,10 +52,13 @@
     <string name="keep_editing">Keep Editing</string>
     <string name="unsaved_changes_dialog_msg">Discard your changes and quit editing?</string>
     <string name="discard">Discard</string>
-    <string name="delete_dialog_msg">Delete this pet?</string>
+    <string name="delete_dialog_msg">Delete this item?</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
     <string name="deletion_successful">Item successfully deleted</string>
     <string name="deletion_failed">Error deleting item</string>
+
+    <!-- Supplier Email -->
+    <string name="supplier_email">name@example.com</string>
 
 </resources>

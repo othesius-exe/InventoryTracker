@@ -117,13 +117,24 @@ public class InventoryProvider extends ContentProvider {
         }
 
         // Check for a price
-         Float price = contentValues.getAsFloat(InventoryEntry.COLUMN_ITEM_PRICE);
+         Double price = 0.00;
+        try {
+            price = contentValues.getAsDouble(InventoryEntry.COLUMN_ITEM_PRICE);
+        } catch (NumberFormatException e) {
+            Log.i("", price + " is not a number");
+        }
             if (price == null) {
                 throw new IllegalArgumentException("Price must be included");
             }
 
         // Check that a quantity has been included
-        Integer quantity = contentValues.getAsInteger(InventoryEntry.COLUMN_ITEM_QUANITITY);
+        Integer quantity = 0;
+        try {
+            quantity = contentValues.getAsInteger(InventoryEntry.COLUMN_ITEM_QUANITITY);
+        } catch (NumberFormatException e) {
+            Log.i("", quantity + " is not a number");
+        }
+
         if (quantity != null && quantity < 0) {
             throw new IllegalArgumentException("Quanity requires a valid number");
         }

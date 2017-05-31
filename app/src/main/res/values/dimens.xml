@@ -21,4 +21,7 @@
 
     <!-- Spinner Dimensions -->
     <dimen name="spinner_padding">16dp</dimen>
+
+    <!-- Image Dimensions -->
+    <dimen name="image_dimen">75dp</dimen>
 </resources>

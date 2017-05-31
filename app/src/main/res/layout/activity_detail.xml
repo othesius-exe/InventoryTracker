@@ -95,9 +95,26 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <ImageView
+                android:id="@+id/image_view"
+                android:layout_width="@dimen/image_dimen"
+                android:layout_height="@dimen/image_dimen"
+                android:src="@drawable/placeholder"/>
+
+            <Button
+                android:id="@+id/camera_button"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginRight="96dp"
+                android:background="@drawable/camera"/>
+
             <TextView
                 android:id="@+id/sell_receive_text_view"
                 style="@style/detail_textview_style"
+                android:layout_below="@+id/image_view"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/editor_textview_height"
                 android:text="@string/change_quantity" />
@@ -123,6 +140,14 @@
 
             <Button
                 android:layout_below="@+id/make_sale_button"
+                android:id="@+id/receive_shipment_button"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/editor_textview_height"
+                android:backgroundTint="@color/colorAccent"
+                android:text="@string/receive" />
+
+            <Button
+                android:layout_below="@+id/receive_shipment_button"
                 android:id="@+id/place_order_button"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/editor_textview_height"

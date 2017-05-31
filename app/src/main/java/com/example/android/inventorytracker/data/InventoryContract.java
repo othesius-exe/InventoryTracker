@@ -60,6 +60,10 @@ public class InventoryContract {
         // Type: Integer
         public static final String COLUMN_ITEM_QUANTITY = "quantity";
 
+        // Item Image
+        // Type: Blob
+        //public static final String COLUMN_ITEM_IMAGE = "productPic";
+
         // Possible values for the description, listed in the spinner dropdown
         public static final int UNKNOWN = 0;
         public static final int ELECTRONIC = 1;

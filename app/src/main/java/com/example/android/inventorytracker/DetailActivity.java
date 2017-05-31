@@ -1,15 +1,20 @@
 package com.example.android.inventorytracker;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -21,10 +26,17 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.inventorytracker.data.InventoryContract.InventoryEntry;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Activity to handle displaying details of individual items in the inventory.
@@ -45,15 +57,25 @@ public class DetailActivity extends AppCompatActivity
 
     private EditText mBuySellEditText;
 
+    private Button mReceiveShipmentButton;
+
     private Button mBuyStockButton;
 
     private Button mSellStockButton;
+
+    private Button mCameraButton;
 
     private Spinner mDescriptionSpinner;
 
     private int mDescription = InventoryEntry.UNKNOWN;
 
     private boolean mItemHasChanged = false;
+
+    private ImageView mItemImage;
+
+    static final int REQUEST_TAKE_PHOTO = 1;
+
+    private String mCurrentPhotoPath;
 
     private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         @Override
@@ -94,10 +116,16 @@ public class DetailActivity extends AppCompatActivity
         mBuyStockButton = (Button) findViewById(R.id.place_order_button);
         // Button will decrease stock by the amount in mBuySellEditText
         mSellStockButton = (Button) findViewById(R.id.make_sale_button);
+        // Button to receive Shipment
+        mReceiveShipmentButton = (Button) findViewById(R.id.receive_shipment_button);
         // Spinner with possible item categories
         mDescriptionSpinner = (Spinner) findViewById(R.id.item_description_spinner);
         // Price edit text
         mPriceEditText = (EditText) findViewById(R.id.price_edit_text);
+        // ImageView
+        mItemImage = (ImageView) findViewById(R.id.image_view);
+        // Camera Button
+        mCameraButton = (Button) findViewById(R.id.camera_button);
 
         mItemEditText.setOnTouchListener(mTouchListener);
         mPriceEditText.setOnTouchListener(mTouchListener);
@@ -106,19 +134,31 @@ public class DetailActivity extends AppCompatActivity
 
         setupSpinner();
 
+        mCameraButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dispatchTakePictureIntent();
+            }
+        });
+
         mBuyStockButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String orderSummary = mItemEditText.getText().toString()
+                        + mBuySellEditText.getText().toString();
+
                 Intent placeOrder = new Intent(Intent.ACTION_SENDTO);
                 placeOrder.setData(Uri.parse("mailto:"));
                 placeOrder.putExtra(Intent.EXTRA_EMAIL, getString(R.string.supplier_email));
-                placeOrder.putExtra(Intent.EXTRA_SUBJECT, mItemEditText.toString());
+                placeOrder.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.product_order));
+                placeOrder.putExtra(Intent.EXTRA_TEXT, orderSummary);
 
                 if (placeOrder.resolveActivity(getPackageManager()) != null) {
                     startActivity(placeOrder);
                 }
             }
         });
+
 
         mSellStockButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,11 +172,20 @@ public class DetailActivity extends AppCompatActivity
      * Helper Method for making a sale
      */
     public void sellStock() {
-
         String saleInput = mBuySellEditText.getText().toString();
         String currentStock = mInStockEditText.getText().toString();
+        String currentPrice = mPriceEditText.getText().toString();
+        Double price = Double.parseDouble(currentPrice);
         int numToSell = 0;
         int stockInt = 0;
+
+        Dialog saleDialog = new Dialog(this);
+        saleDialog.setContentView(R.layout.popupview);
+        saleDialog.setTitle(getString(R.string.sale_title));
+        TextView priceView = (TextView) findViewById(R.id.sale_price);
+
+
+
         try {
             numToSell = Integer.parseInt(saleInput);
             stockInt = Integer.parseInt(currentStock);
@@ -148,21 +197,31 @@ public class DetailActivity extends AppCompatActivity
         }
 
         int afterSaleStock;
+        Double totalSalePrice;
         String afterSaleStockString;
         if (numToSell > 0 && stockInt - numToSell >= 0) {
             afterSaleStock = stockInt - numToSell;
             afterSaleStockString = Integer.toString(afterSaleStock);
             mInStockEditText.setText(afterSaleStockString);
+
+            totalSalePrice = price * numToSell;
+            String totalSalePriceString = Double.toString(totalSalePrice);
+            priceView.setText(totalSalePriceString);
+            saleDialog.show();
+        } else {
+            priceView.setText(getString(R.string.sale_failed));
+            saleDialog.show();
         }
     }
+
     /**
      * Setup the spinner
      */
     private void setupSpinner() {
-        ArrayAdapter descrpitionSpinnerAdapter = ArrayAdapter.createFromResource(this,
+        ArrayAdapter descriptionSpinnerAdapter = ArrayAdapter.createFromResource(this,
                 R.array.item_descriptors_array, android.R.layout.simple_spinner_item);
-        descrpitionSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-        mDescriptionSpinner.setAdapter(descrpitionSpinnerAdapter);
+        descriptionSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+        mDescriptionSpinner.setAdapter(descriptionSpinnerAdapter);
 
         mDescriptionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -203,6 +262,7 @@ public class DetailActivity extends AppCompatActivity
         String inStock = mInStockEditText.getText().toString().trim();
         String sellStock = mBuySellEditText.getText().toString().trim();
         String unitPrice = mPriceEditText.getText().toString().trim();
+        Bitmap itemImage = mItemImage.getDrawingCache();
 
         // Check to see if this is a new item
         if (mCurrentItemUri == null && TextUtils.isEmpty(name) && TextUtils.isEmpty(inStock)
@@ -228,6 +288,9 @@ public class DetailActivity extends AppCompatActivity
             stock = Integer.parseInt(inStock);
         }
         values.put(InventoryEntry.COLUMN_ITEM_QUANTITY, stock);
+
+        // TODO Check for an image
+
 
         // Determine if this is a new or existing item
         if (mCurrentItemUri == null) {
@@ -467,5 +530,43 @@ public class DetailActivity extends AppCompatActivity
 
         // Close the activity
         finish();
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
     }
 }

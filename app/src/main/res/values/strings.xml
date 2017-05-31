@@ -19,7 +19,7 @@
     <!-- Button labels -->
     <string name="order_button">Place Order</string>
     <string name="sale_button">Make Sale</string>
-    <string name="order">Order More</string>
+    <string name="receive">Receive Shipment</string>
 
     <!-- Item Name Info Strings -->
     <string name="item_name">Item Name</string>
@@ -27,7 +27,7 @@
 
     <!-- Quantity info Strings -->
     <string name="quantity_hint">Number in Stock:</string>
-    <string name="change_quantity">Sell</string>
+    <string name="change_quantity">Sell/Receive</string>
     <string name="in_stock">0</string>
     <string name="num_to_change">Quantity</string>
     <string name="unit_price">0.00</string>
@@ -60,5 +60,12 @@
 
     <!-- Supplier Email -->
     <string name="supplier_email">name@example.com</string>
+    <string name="product_order">Product Order</string>
+
+    <!-- Popup layout strings -->
+    <string name="sale">Total Sale: </string>
+    <string name="sale_price">$0.00</string>
+    <string name="sale_failed">Illegal Sale Amount</string>
+    <string name="sale_title">Sale Information</string>
 
 </resources>

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -47,23 +48,17 @@ public class DetailActivity extends AppCompatActivity
 
     private static final int EXISTING_ITEM_LOADER = 0;
 
-    private Uri mCurrentItemUri;
+    public Uri mCurrentItemUri;
 
     private EditText mItemEditText;
-
     private EditText mInStockEditText;
-
     private EditText mPriceEditText;
-
     private EditText mBuySellEditText;
 
-    private Button mReceiveShipmentButton;
-
-    private Button mBuyStockButton;
-
-    private Button mSellStockButton;
-
-    private Button mCameraButton;
+    Button mReceiveShipmentButton;
+    Button mBuyStockButton;
+    Button mSellStockButton;
+    Button mCameraButton;
 
     private Spinner mDescriptionSpinner;
 
@@ -75,7 +70,7 @@ public class DetailActivity extends AppCompatActivity
 
     static final int REQUEST_TAKE_PHOTO = 1;
 
-    private String mCurrentPhotoPath;
+    private String mPhotoPath;
 
     private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         @Override
@@ -149,7 +144,6 @@ public class DetailActivity extends AppCompatActivity
 
                 Intent placeOrder = new Intent(Intent.ACTION_SENDTO);
                 placeOrder.setData(Uri.parse("mailto:"));
-                placeOrder.putExtra(Intent.EXTRA_EMAIL, getString(R.string.supplier_email));
                 placeOrder.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.product_order));
                 placeOrder.putExtra(Intent.EXTRA_TEXT, orderSummary);
 
@@ -166,6 +160,26 @@ public class DetailActivity extends AppCompatActivity
                 sellStock();
             }
         });
+
+        mReceiveShipmentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                recieveStock();
+            }
+        });
+    }
+
+    /**
+     * Helper method for incrementing the amount in stock
+     */
+    public void recieveStock() {
+        String currentStock = mInStockEditText.getText().toString();
+        String addStock = mBuySellEditText.getText().toString();
+        int currentStockInt = Integer.parseInt(currentStock);
+        int addStockInt = Integer.parseInt(addStock);
+        int newStockTotalInt = currentStockInt + addStockInt;
+        String newStockTotalString = Integer.toString(newStockTotalInt);
+        mInStockEditText.setText(newStockTotalString);
     }
 
     /**
@@ -183,7 +197,6 @@ public class DetailActivity extends AppCompatActivity
         saleDialog.setContentView(R.layout.popupview);
         saleDialog.setTitle(getString(R.string.sale_title));
         TextView priceView = (TextView) findViewById(R.id.sale_price);
-
 
 
         try {
@@ -262,7 +275,6 @@ public class DetailActivity extends AppCompatActivity
         String inStock = mInStockEditText.getText().toString().trim();
         String sellStock = mBuySellEditText.getText().toString().trim();
         String unitPrice = mPriceEditText.getText().toString().trim();
-        Bitmap itemImage = mItemImage.getDrawingCache();
 
         // Check to see if this is a new item
         if (mCurrentItemUri == null && TextUtils.isEmpty(name) && TextUtils.isEmpty(inStock)
@@ -387,7 +399,8 @@ public class DetailActivity extends AppCompatActivity
                 InventoryEntry.COLUMN_ITEM_NAME,
                 InventoryEntry.COLUMN_ITEM_DESCRIPTION,
                 InventoryEntry.COLUMN_ITEM_QUANTITY,
-                InventoryEntry.COLUMN_ITEM_PRICE };
+                InventoryEntry.COLUMN_ITEM_IMAGE,
+                InventoryEntry.COLUMN_ITEM_PRICE};
 
         return new CursorLoader(this,   // Parent activity context
                 mCurrentItemUri,         // Query the content URI for the current pet
@@ -407,16 +420,18 @@ public class DetailActivity extends AppCompatActivity
         // Proceed with moving to the first row of the cursor and reading data from it
         // (This should be the only row in the cursor)
         if (cursor.moveToFirst()) {
-            // Find the columns of pet attributes that we're interested in
+            // Find the columns of item attributes that we're interested in
             int nameColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_NAME);
             int descColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_DESCRIPTION);
             int priceColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_PRICE);
+            int imageColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_IMAGE);
             int quantityColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_QUANTITY);
 
             // Extract out the value from the Cursor for the given column index
             String name = cursor.getString(nameColumnIndex);
             int description = cursor.getInt(descColumnIndex);
             float price = cursor.getInt(priceColumnIndex);
+            String imagePath = cursor.getString(imageColumnIndex);
             int quantity = cursor.getInt(quantityColumnIndex);
 
             // Update the views on the screen with the values from the database
@@ -532,22 +547,11 @@ public class DetailActivity extends AppCompatActivity
         finish();
     }
 
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
+    /**
+     * Camera code to save full image to file + save file URI / or path to database, and set image on the imageview in the add activity.
+     */
 
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
+    //launch the camera app
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
@@ -566,7 +570,71 @@ public class DetailActivity extends AppCompatActivity
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+
+                //create scaled bitmap from file and set on imageview
+                setPic();
+
             }
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+            setPic();
+        }
+    }
+
+    //creates an image file at a location with a unique name. used to generate a file to fill with JPEG data from dispatchTakePictureIntent.
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void setPic() {
+
+        if (mPhotoPath != null) {
+
+            //scale factor to size the image by
+            int scaleFactor;
+
+            // Get the dimensions of the View
+            int targetW = mItemImage.getWidth();
+            int targetH = mItemImage.getHeight();
+
+            // Get the dimensions of the bitmap
+            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+            bmOptions.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(mPhotoPath, bmOptions);
+            int photoW = bmOptions.outWidth;
+            int photoH = bmOptions.outHeight;
+
+            if (targetW == 0 && targetH == 0){
+                scaleFactor = 1;
+            } else {
+                // Determine how much to scale down the image
+                scaleFactor = Math.min(photoW / targetW, photoH / targetH);
+            }
+
+            // Decode the image file into a Bitmap sized to fill the View
+            bmOptions.inJustDecodeBounds = false;
+            bmOptions.inSampleSize = scaleFactor;
+            bmOptions.inPurgeable = true;
+
+            Bitmap bitmap = BitmapFactory.decodeFile(mPhotoPath, bmOptions);
+            mItemImage.setImageBitmap(bitmap);
+        }
+
     }
 }

@@ -59,7 +59,6 @@
     <string name="deletion_failed">Error deleting item</string>
 
     <!-- Supplier Email -->
-    <string name="supplier_email">name@example.com</string>
     <string name="product_order">Product Order</string>
 
     <!-- Popup layout strings -->

@@ -1,3 +1,6 @@
+// Icon Images Courtesy of Icons8
+// Camera implementation uses some code from https://github.com/crlsndrsjmnz/MyFileProviderExample
+
 package com.example.android.inventorytracker;
 
 import android.Manifest;

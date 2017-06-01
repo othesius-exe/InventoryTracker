@@ -19,7 +19,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
-import android.provider.OpenableColumns;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
@@ -306,16 +305,17 @@ public class DetailActivity extends AppCompatActivity
         String inStock = mInStockEditText.getText().toString().trim();
         String sellStock = mBuySellEditText.getText().toString().trim();
         String unitPrice = mPriceEditText.getText().toString().trim();
-        String photoPath = mUri.getPath();
+        String photoPath = "";
+
+        if (mUri != null) {
+            photoPath = mUri.getPath();
+            mItemImage.setTag(photoPath);
+        }
 
         // Check to see if this is a new item
         if (mCurrentItemUri == null && TextUtils.isEmpty(name) && TextUtils.isEmpty(inStock)
                 && TextUtils.isEmpty(sellStock) && mDescription == InventoryEntry.UNKNOWN) {
             return;
-        }
-
-        if (photoPath == null) {
-
         }
 
         // Build a ContentValues with the input
@@ -621,11 +621,8 @@ public class DetailActivity extends AppCompatActivity
 
 
                     mCameraButton.setEnabled(true);
-                } else {
-
                 }
             }
-            return;
         }
     }
 
@@ -713,26 +710,6 @@ public class DetailActivity extends AppCompatActivity
                 Log.e(LOG_TAG, "Error closing ParcelFile Descriptor");
             }
         }
-    }
-
-    public String getFilePath() {
-        /*
-         * Get the file's content URI from the incoming Intent,
-         * then query the server app to get the file's display name
-         * and size.
-         */
-        Cursor returnCursor =
-                getContentResolver().query(mUri, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null);
-
-        /*
-         * Get the column indexes of the data in the Cursor,
-         * move to the first row in the Cursor, get the data,
-         * and display it.
-         */
-        returnCursor.moveToFirst();
-        String fileName = returnCursor.getString(returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-
-        return fileName;
     }
 
     private File createImageFile() throws IOException {

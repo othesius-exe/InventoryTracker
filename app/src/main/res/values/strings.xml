@@ -18,8 +18,8 @@
 
     <!-- Button labels -->
     <string name="order_button">Place Order</string>
-    <string name="sale_button">Make Sale</string>
-    <string name="receive">Receive Shipment</string>
+    <string name="sale_button">Send Invoice</string>
+    <string name="receive">Accept Shipment</string>
 
     <!-- Item Name Info Strings -->
     <string name="item_name">Item Name</string>
@@ -61,10 +61,7 @@
     <!-- Supplier Email -->
     <string name="product_order">Product Order</string>
 
-    <!-- Popup layout strings -->
+    <!-- Sale Summary strings -->
     <string name="sale">Total Sale: </string>
-    <string name="sale_price">$0.00</string>
-    <string name="sale_failed">Illegal Sale Amount</string>
-    <string name="sale_title">Sale Information</string>
-
+    <string name="invoice">Invoice For Sale</string>
 </resources>

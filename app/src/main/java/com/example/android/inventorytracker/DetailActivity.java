@@ -3,7 +3,6 @@ package com.example.android.inventorytracker;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
@@ -38,7 +37,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.inventorytracker.data.InventoryContract.InventoryEntry;
@@ -60,7 +58,6 @@ public class DetailActivity extends AppCompatActivity
     private static final int EXISTING_ITEM_LOADER = 0;
 
     public Uri mCurrentItemUri;
-    public Uri mPhotoUri;
 
     private EditText mItemEditText;
     private EditText mInStockEditText;
@@ -85,15 +82,14 @@ public class DetailActivity extends AppCompatActivity
     private static final int PICK_IMAGE_REQUEST = 0;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int MY_PERMISSIONS_REQUEST = 2;
+    private boolean isGalleryPicture = false;
 
     private static final String FILE_PROVIDER_AUTHORITY = "com.example.android.fileprovider";
 
 
     private Uri mUri;
     private Bitmap mBitmap;
-
-
-    private boolean isGalleryPicture = false;
+    public String mInvoiceSummary;
 
     private static final String JPEG_FILE_PREFIX = "IMG_";
     private static final String JPEG_FILE_SUFFIX = ".jpg";
@@ -170,7 +166,8 @@ public class DetailActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 String orderSummary = mItemEditText.getText().toString()
-                        + mBuySellEditText.getText().toString();
+                        + "\n" + getString(R.string.num_to_change) + " "
+                        +  mBuySellEditText.getText().toString();
 
                 Intent placeOrder = new Intent(Intent.ACTION_SENDTO);
                 placeOrder.setData(Uri.parse("mailto:"));
@@ -187,7 +184,53 @@ public class DetailActivity extends AppCompatActivity
         mSellStockButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sellStock();
+
+                String forSale = mBuySellEditText.getText().toString();
+                String inStock = mInStockEditText.getText().toString();
+                String salePrice = mPriceEditText.getText().toString();
+
+                int numToSell = 0;
+                int stockInt = 0;
+                Double itemPrice = 0.00;
+
+                try {
+                    numToSell = Integer.parseInt(forSale);
+                    stockInt = Integer.parseInt(inStock);
+                    itemPrice = Double.parseDouble(salePrice);
+                    Log.i("", numToSell + " is a number");
+                    Log.i("", stockInt + " is a number");
+                } catch (NumberFormatException e) {
+                    Log.i("", numToSell + " is not a number");
+                    Log.i("", stockInt + " is not a number");
+                }
+                Double totalSale = 0.00;
+                if (numToSell > 0 && stockInt > 0 && stockInt - numToSell >= 0) {
+                    int newStock = stockInt - numToSell;
+                    totalSale = itemPrice * numToSell;
+                    mInStockEditText.setText(Integer.toString(newStock));
+                }
+
+                StringBuilder invoiceString = new StringBuilder();
+                invoiceString.append(mItemEditText.getText().toString());
+                invoiceString.append("\n");
+                invoiceString.append(mPriceEditText.getText().toString());
+                invoiceString.append("\n\n" + getResources().getString(R.string.num_to_change) + " ");
+                invoiceString.append(mBuySellEditText.getText().toString());
+                invoiceString.append("\n\n" + getResources().getString(R.string.sale));
+                invoiceString.append("\n");
+                invoiceString.append(totalSale);
+
+                mInvoiceSummary = invoiceString.toString();
+
+                Intent sendInvoice = new Intent(Intent.ACTION_SENDTO);
+                sendInvoice.setData(Uri.parse("mailto:"));
+                sendInvoice.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.invoice));
+                sendInvoice.putExtra(Intent.EXTRA_TEXT, mInvoiceSummary);
+
+                if (sendInvoice.resolveActivity(getPackageManager()) != null) {
+                    startActivity(sendInvoice);
+
+                }
             }
         });
 
@@ -210,51 +253,6 @@ public class DetailActivity extends AppCompatActivity
         int newStockTotalInt = currentStockInt + addStockInt;
         String newStockTotalString = Integer.toString(newStockTotalInt);
         mInStockEditText.setText(newStockTotalString);
-    }
-
-    /**
-     * Helper Method for making a sale
-     */
-    public void sellStock() {
-        String saleInput = mBuySellEditText.getText().toString();
-        String currentStock = mInStockEditText.getText().toString();
-        String currentPrice = mPriceEditText.getText().toString();
-        Double price = Double.parseDouble(currentPrice);
-        int numToSell = 0;
-        int stockInt = 0;
-
-        Dialog saleDialog = new Dialog(this);
-        saleDialog.setContentView(R.layout.popupview);
-        saleDialog.setTitle(getString(R.string.sale_title));
-        TextView priceView = (TextView) findViewById(R.id.sale_price);
-
-
-        try {
-            numToSell = Integer.parseInt(saleInput);
-            stockInt = Integer.parseInt(currentStock);
-            Log.i("", numToSell + " is a number");
-            Log.i("", stockInt + " is a number");
-        } catch (NumberFormatException e) {
-            Log.i("", numToSell + " is not a number");
-            Log.i("", stockInt + " is not a number");
-        }
-
-        int afterSaleStock;
-        Double totalSalePrice;
-        String afterSaleStockString;
-        if (numToSell > 0 && stockInt - numToSell >= 0) {
-            afterSaleStock = stockInt - numToSell;
-            afterSaleStockString = Integer.toString(afterSaleStock);
-            mInStockEditText.setText(afterSaleStockString);
-
-            totalSalePrice = price * numToSell;
-            String totalSalePriceString = Double.toString(totalSalePrice);
-            priceView.setText(totalSalePriceString);
-            saleDialog.show();
-        } else {
-            priceView.setText(getString(R.string.sale_failed));
-            saleDialog.show();
-        }
     }
 
     /**
@@ -432,7 +430,7 @@ public class DetailActivity extends AppCompatActivity
                 InventoryEntry.COLUMN_ITEM_PRICE};
 
         return new CursorLoader(this,   // Parent activity context
-                mCurrentItemUri,         // Query the content URI for the current pet
+                mCurrentItemUri,         // Query the content URI for the current item
                 projection,             // Columns to include in the resulting Cursor
                 null,                   // No selection clause
                 null,                   // No selection arguments
@@ -462,13 +460,13 @@ public class DetailActivity extends AppCompatActivity
             float price = cursor.getInt(priceColumnIndex);
             int quantity = cursor.getInt(quantityColumnIndex);
             String imageString = cursor.getString(imageColumnIndex);
-            Uri imageUri = Uri.parse(imageString);
+            Uri imageUri = Uri.parse("content://" + FILE_PROVIDER_AUTHORITY + imageString);
 
             // Update the views on the screen with the values from the database
             mItemEditText.setText(name);
             mPriceEditText.setText(String.format("%.2f", price));
             mInStockEditText.setText(Integer.toString(quantity));
-            mItemImage.setImageURI(imageUri);
+            mItemImage.setImageBitmap(getBitmapFromUri(imageUri));
 
 
 

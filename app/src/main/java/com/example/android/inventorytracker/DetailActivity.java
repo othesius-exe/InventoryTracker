@@ -1,5 +1,7 @@
 package com.example.android.inventorytracker;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentValues;
@@ -7,14 +9,21 @@ import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -35,9 +44,11 @@ import android.widget.Toast;
 import com.example.android.inventorytracker.data.InventoryContract.InventoryEntry;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Activity to handle displaying details of individual items in the inventory.
@@ -49,6 +60,7 @@ public class DetailActivity extends AppCompatActivity
     private static final int EXISTING_ITEM_LOADER = 0;
 
     public Uri mCurrentItemUri;
+    public Uri mPhotoUri;
 
     private EditText mItemEditText;
     private EditText mInStockEditText;
@@ -68,9 +80,25 @@ public class DetailActivity extends AppCompatActivity
 
     private ImageView mItemImage;
 
-    static final int REQUEST_TAKE_PHOTO = 1;
+    private static final String LOG_TAG = DetailActivity.class.getSimpleName();
 
-    private String mPhotoPath;
+    private static final int PICK_IMAGE_REQUEST = 0;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int MY_PERMISSIONS_REQUEST = 2;
+
+    private static final String FILE_PROVIDER_AUTHORITY = "com.example.android.fileprovider";
+
+
+    private Uri mUri;
+    private Bitmap mBitmap;
+
+
+    private boolean isGalleryPicture = false;
+
+    private static final String JPEG_FILE_PREFIX = "IMG_";
+    private static final String JPEG_FILE_SUFFIX = ".jpg";
+
+    private static final String CAMERA_DIR = "/dcim/";
 
     private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         @Override
@@ -84,6 +112,8 @@ public class DetailActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
+        requestPermissions();
 
         // Check for an existing Uri to determine if this is a new item
         Intent intent = getIntent();
@@ -132,7 +162,7 @@ public class DetailActivity extends AppCompatActivity
         mCameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dispatchTakePictureIntent();
+                takePicture();
             }
         });
 
@@ -164,7 +194,7 @@ public class DetailActivity extends AppCompatActivity
         mReceiveShipmentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                recieveStock();
+                receiveStock();
             }
         });
     }
@@ -172,7 +202,7 @@ public class DetailActivity extends AppCompatActivity
     /**
      * Helper method for incrementing the amount in stock
      */
-    public void recieveStock() {
+    public void receiveStock() {
         String currentStock = mInStockEditText.getText().toString();
         String addStock = mBuySellEditText.getText().toString();
         int currentStockInt = Integer.parseInt(currentStock);
@@ -275,6 +305,7 @@ public class DetailActivity extends AppCompatActivity
         String inStock = mInStockEditText.getText().toString().trim();
         String sellStock = mBuySellEditText.getText().toString().trim();
         String unitPrice = mPriceEditText.getText().toString().trim();
+        String photoPath = mUri.getPath();
 
         // Check to see if this is a new item
         if (mCurrentItemUri == null && TextUtils.isEmpty(name) && TextUtils.isEmpty(inStock)
@@ -286,6 +317,7 @@ public class DetailActivity extends AppCompatActivity
         ContentValues values = new ContentValues();
         values.put(InventoryEntry.COLUMN_ITEM_NAME, name);
         values.put(InventoryEntry.COLUMN_ITEM_DESCRIPTION, mDescription);
+        values.put(InventoryEntry.COLUMN_ITEM_IMAGE, photoPath);
 
         // If a price is not included, set to 0
         Double price = 0.00;
@@ -300,9 +332,6 @@ public class DetailActivity extends AppCompatActivity
             stock = Integer.parseInt(inStock);
         }
         values.put(InventoryEntry.COLUMN_ITEM_QUANTITY, stock);
-
-        // TODO Check for an image
-
 
         // Determine if this is a new or existing item
         if (mCurrentItemUri == null) {
@@ -431,13 +460,17 @@ public class DetailActivity extends AppCompatActivity
             String name = cursor.getString(nameColumnIndex);
             int description = cursor.getInt(descColumnIndex);
             float price = cursor.getInt(priceColumnIndex);
-            String imagePath = cursor.getString(imageColumnIndex);
             int quantity = cursor.getInt(quantityColumnIndex);
+            String imageString = cursor.getString(imageColumnIndex);
+            Uri imageUri = Uri.parse(imageString);
 
             // Update the views on the screen with the values from the database
             mItemEditText.setText(name);
             mPriceEditText.setText(String.format("%.2f", price));
             mInStockEditText.setText(Integer.toString(quantity));
+            mItemImage.setImageURI(imageUri);
+
+
 
             // Description is a dropdown spinner, so map the constant value from the database
             // Then call setSelection() so that option is displayed on screen as the current selection.
@@ -547,94 +580,189 @@ public class DetailActivity extends AppCompatActivity
         finish();
     }
 
-    /**
-     * Camera code to save full image to file + save file URI / or path to database, and set image on the imageview in the add activity.
-     */
+    public void requestPermissions() {
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
 
-    //launch the camera app
-    private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-            }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this,
-                        "com.example.android.fileprovider",
-                        photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE) ||
+                    ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    || ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
 
-                //create scaled bitmap from file and set on imageview
-                setPic();
+            } else {
 
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA},
+                        MY_PERMISSIONS_REQUEST);
             }
         }
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-            setPic();
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+
+
+                    mCameraButton.setEnabled(true);
+                } else {
+
+                }
+            }
+            return;
         }
     }
 
-    //creates an image file at a location with a unique name. used to generate a file to fill with JPEG data from dispatchTakePictureIntent.
+    public void takePicture() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        try {
+            File f = createImageFile();
+
+            Log.d(LOG_TAG, "File: " + f.getAbsolutePath());
+
+            mUri = FileProvider.getUriForFile(
+                    this, FILE_PROVIDER_AUTHORITY, f);
+
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
+
+            // Solution taken from http://stackoverflow.com/a/18332000/3346625
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+                List<ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(takePictureIntent, PackageManager.MATCH_DEFAULT_ONLY);
+                for (ResolveInfo resolveInfo : resInfoList) {
+                    String packageName = resolveInfo.activityInfo.packageName;
+                    grantUriPermission(packageName, mUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+            }
+
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        Log.i(LOG_TAG, "Received an \"Activity Result\"");
+        // The ACTION_OPEN_DOCUMENT intent was sent with the request code READ_REQUEST_CODE.
+        // If the request code seen here doesn't match, it's the response to some other intent,
+        // and the below code shouldn't run at all.
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
+            // The document selected by the user won't be returned in the intent.
+            // Instead, a URI to that document will be contained in the return intent
+            // provided to this method as a parameter.  Pull that uri using "resultData.getData()"
+
+            if (resultData != null) {
+                mUri = resultData.getData();
+                Log.i(LOG_TAG, "Uri: " + mUri.toString());
+
+                mBitmap = getBitmapFromUri(mUri);
+                mItemImage.setImageBitmap(mBitmap);
+
+                isGalleryPicture = true;
+            }
+        } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+            Log.i(LOG_TAG, "Uri: " + mUri.toString());
+
+            mBitmap = getBitmapFromUri(mUri);
+            mItemImage.setImageBitmap(mBitmap);
+
+            isGalleryPicture = false;
+        }
+    }
+
+    private Bitmap getBitmapFromUri(Uri uri) {
+        ParcelFileDescriptor parcelFileDescriptor = null;
+        try {
+            parcelFileDescriptor =
+                    getContentResolver().openFileDescriptor(uri, "r");
+            FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+            Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+            parcelFileDescriptor.close();
+            return image;
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Failed to load image.", e);
+            return null;
+        } finally {
+            try {
+                if (parcelFileDescriptor != null) {
+                    parcelFileDescriptor.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e(LOG_TAG, "Error closing ParcelFile Descriptor");
+            }
+        }
+    }
+
+    public String getFilePath() {
+        /*
+         * Get the file's content URI from the incoming Intent,
+         * then query the server app to get the file's display name
+         * and size.
+         */
+        Cursor returnCursor =
+                getContentResolver().query(mUri, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null);
+
+        /*
+         * Get the column indexes of the data in the Cursor,
+         * move to the first row in the Cursor, get the data,
+         * and display it.
+         */
+        returnCursor.moveToFirst();
+        String fileName = returnCursor.getString(returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+
+        return fileName;
+    }
+
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mPhotoPath = image.getAbsolutePath();
-        return image;
+        String imageFileName = JPEG_FILE_PREFIX + timeStamp + "_";
+        File albumF = getAlbumDir();
+        File imageF = File.createTempFile(imageFileName, JPEG_FILE_SUFFIX, albumF);
+        return imageF;
     }
 
-    private void setPic() {
+    private File getAlbumDir() {
+        File storageDir = null;
 
-        if (mPhotoPath != null) {
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
 
-            //scale factor to size the image by
-            int scaleFactor;
+            storageDir = new File(Environment.getExternalStorageDirectory()
+                    + CAMERA_DIR
+                    + getString(R.string.app_name));
 
-            // Get the dimensions of the View
-            int targetW = mItemImage.getWidth();
-            int targetH = mItemImage.getHeight();
+            Log.d(LOG_TAG, "Dir: " + storageDir);
 
-            // Get the dimensions of the bitmap
-            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-            bmOptions.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(mPhotoPath, bmOptions);
-            int photoW = bmOptions.outWidth;
-            int photoH = bmOptions.outHeight;
-
-            if (targetW == 0 && targetH == 0){
-                scaleFactor = 1;
-            } else {
-                // Determine how much to scale down the image
-                scaleFactor = Math.min(photoW / targetW, photoH / targetH);
+            if (storageDir != null) {
+                if (!storageDir.mkdirs()) {
+                    if (!storageDir.exists()) {
+                        Log.d(LOG_TAG, "failed to create directory");
+                        return null;
+                    }
+                }
             }
 
-            // Decode the image file into a Bitmap sized to fill the View
-            bmOptions.inJustDecodeBounds = false;
-            bmOptions.inSampleSize = scaleFactor;
-            bmOptions.inPurgeable = true;
-
-            Bitmap bitmap = BitmapFactory.decodeFile(mPhotoPath, bmOptions);
-            mItemImage.setImageBitmap(bitmap);
+        } else {
+            Log.v(getString(R.string.app_name), "External storage is not mounted READ/WRITE.");
         }
 
+        return storageDir;
     }
 }

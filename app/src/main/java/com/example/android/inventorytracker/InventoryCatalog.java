@@ -88,7 +88,6 @@ public class InventoryCatalog extends AppCompatActivity
         values.put(InventoryEntry.COLUMN_ITEM_DESCRIPTION, InventoryEntry.CONSUMABLES);
         values.put(InventoryEntry.COLUMN_ITEM_PRICE, 1.99);
         values.put(InventoryEntry.COLUMN_ITEM_QUANTITY, 10);
-        values.put(InventoryEntry.COLUMN_ITEM_IMAGE, R.drawable.placeholder);
 
         // Uri for test data
         Uri newUri = getContentResolver().insert(InventoryEntry.CONTENT_URI, values);

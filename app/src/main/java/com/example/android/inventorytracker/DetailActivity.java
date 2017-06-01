@@ -208,29 +208,32 @@ public class DetailActivity extends AppCompatActivity
                     int newStock = stockInt - numToSell;
                     totalSale = itemPrice * numToSell;
                     mInStockEditText.setText(Integer.toString(newStock));
+                    StringBuilder invoiceString = new StringBuilder();
+                    invoiceString.append(mItemEditText.getText().toString());
+                    invoiceString.append("\n");
+                    invoiceString.append(mPriceEditText.getText().toString());
+                    invoiceString.append("\n\n" + getResources().getString(R.string.num_to_change) + " ");
+                    invoiceString.append(mBuySellEditText.getText().toString());
+                    invoiceString.append("\n\n" + getResources().getString(R.string.sale));
+                    invoiceString.append("\n");
+                    invoiceString.append(totalSale);
+
+                    mInvoiceSummary = invoiceString.toString();
+
+                    Intent sendInvoice = new Intent(Intent.ACTION_SENDTO);
+                    sendInvoice.setData(Uri.parse("mailto:"));
+                    sendInvoice.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.invoice));
+                    sendInvoice.putExtra(Intent.EXTRA_TEXT, mInvoiceSummary);
+
+                    if (sendInvoice.resolveActivity(getPackageManager()) != null) {
+                        startActivity(sendInvoice);
+
+                    }
+                } else {
+                    Toast.makeText(DetailActivity.this, "Cannot sell negative number of items", Toast.LENGTH_SHORT).show();
+
                 }
 
-                StringBuilder invoiceString = new StringBuilder();
-                invoiceString.append(mItemEditText.getText().toString());
-                invoiceString.append("\n");
-                invoiceString.append(mPriceEditText.getText().toString());
-                invoiceString.append("\n\n" + getResources().getString(R.string.num_to_change) + " ");
-                invoiceString.append(mBuySellEditText.getText().toString());
-                invoiceString.append("\n\n" + getResources().getString(R.string.sale));
-                invoiceString.append("\n");
-                invoiceString.append(totalSale);
-
-                mInvoiceSummary = invoiceString.toString();
-
-                Intent sendInvoice = new Intent(Intent.ACTION_SENDTO);
-                sendInvoice.setData(Uri.parse("mailto:"));
-                sendInvoice.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.invoice));
-                sendInvoice.putExtra(Intent.EXTRA_TEXT, mInvoiceSummary);
-
-                if (sendInvoice.resolveActivity(getPackageManager()) != null) {
-                    startActivity(sendInvoice);
-
-                }
             }
         });
 
@@ -309,6 +312,10 @@ public class DetailActivity extends AppCompatActivity
         if (mCurrentItemUri == null && TextUtils.isEmpty(name) && TextUtils.isEmpty(inStock)
                 && TextUtils.isEmpty(sellStock) && mDescription == InventoryEntry.UNKNOWN) {
             return;
+        }
+
+        if (photoPath == null) {
+
         }
 
         // Build a ContentValues with the input

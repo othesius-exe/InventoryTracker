@@ -306,7 +306,6 @@ public class DetailActivity extends AppCompatActivity
     private void saveItem() {
         String name = mItemEditText.getText().toString().trim();
         String inStock = mInStockEditText.getText().toString().trim();
-        String sellStock = mBuySellEditText.getText().toString().trim();
         String unitPrice = mPriceEditText.getText().toString().trim();
         String photoPath = "";
 
@@ -316,8 +315,9 @@ public class DetailActivity extends AppCompatActivity
         }
 
         // Check to see if this is a new item
-        if (mCurrentItemUri == null && TextUtils.isEmpty(name) && TextUtils.isEmpty(inStock)
-                && TextUtils.isEmpty(sellStock) && mDescription == InventoryEntry.UNKNOWN) {
+        if (mCurrentItemUri == null && TextUtils.isEmpty(name) || TextUtils.isEmpty(inStock)
+                || mDescription == InventoryEntry.UNKNOWN) {
+            Toast.makeText(this, "All Fields Must Be Filled Out", Toast.LENGTH_LONG).show();
             return;
         }
 

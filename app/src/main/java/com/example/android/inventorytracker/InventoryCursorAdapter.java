@@ -5,10 +5,12 @@ import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import com.example.android.inventorytracker.data.InventoryContract.InventoryEntry;
+
 /**
  * Java Code to implement a custom cursor adapter to handle displaying new cursor objects in a List.
  */
@@ -29,8 +31,9 @@ public class InventoryCursorAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         // Find the views in the list_item file that will house the information
         TextView nameView = (TextView) view.findViewById(R.id.item_name_view);
-        TextView quantityView = (TextView) view.findViewById(R.id.item_quantity_view);
+        final TextView quantityView = (TextView) view.findViewById(R.id.item_quantity_view);
         TextView priceView = (TextView) view.findViewById(R.id.item_price_view);
+        Button decrement = (Button) view.findViewById(R.id.list_sale_button);
 
         // Get the columns of the item attributes to display
         int nameColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_NAME);
@@ -39,12 +42,22 @@ public class InventoryCursorAdapter extends CursorAdapter {
 
         // Read the attributes from the cursor
         String itemName = cursor.getString(nameColumnIndex);
-        String itemQuantity = cursor.getString(quantityColumnIndex);
+        final String itemQuantity = cursor.getString(quantityColumnIndex);
         String itemPrice = cursor.getString(priceColumnIndex);
 
         nameView.setText(itemName);
         quantityView.setText(itemQuantity);
         priceView.setText(itemPrice);
 
+        decrement.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int quantity = Integer.parseInt(itemQuantity);
+                if (quantity > 0) {
+                    int newQuantity = quantity - 1;
+                    quantityView.setText(Integer.toString(newQuantity));
+                }
+            }
+        });
     }
 }

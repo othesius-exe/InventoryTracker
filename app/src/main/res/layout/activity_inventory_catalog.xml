@@ -17,19 +17,19 @@
         android:layout_centerInParent="true">
 
         <TextView
-            style="@style/empty_text_style"
             android:id="@+id/empty_text_view"
+            style="@style/empty_text_style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"/>
+            android:layout_centerInParent="true" />
 
         <TextView
-            style="@style/empty_subtext_style"
             android:id="@+id/empty_subtext_view"
+            style="@style/empty_subtext_style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/empty_text_view"
-            android:layout_centerInParent="false"/>
+            android:layout_centerInParent="false" />
     </RelativeLayout>
 
     <android.support.design.widget.FloatingActionButton
@@ -39,5 +39,5 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/add"/>
+        android:src="@drawable/add" />
 </RelativeLayout>

@@ -1,23 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/item_name_view"
         style="@style/list_item_style"
+        android:focusable="false"
         android:layout_width="match_parent"
         android:layout_height="@dimen/list_item_height" />
 
-    <TextView
-        android:id="@+id/item_quantity_view"
-        style="@style/sub_list_item_style"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/sub_item_height" />
+        android:layout_height="@dimen/sub_item_height">
+
+        <TextView
+            android:id="@+id/item_quantity_view"
+            style="@style/sub_list_item_style"
+            android:layout_width="wrap_content"
+            android:focusable="false"
+            android:layout_height="@dimen/sub_item_height" />
+
+        <Button
+            android:id="@+id/list_sale_button"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/sub_item_height"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:focusable="false"
+            android:layout_marginRight="16dp"
+            android:text="@string/decrement"/>
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/item_price_view"
         style="@style/sub_list_item_style"
+        android:focusable="false"
         android:layout_width="match_parent"
         android:layout_height="@dimen/sub_item_height" />
 

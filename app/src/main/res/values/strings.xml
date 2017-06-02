@@ -64,4 +64,5 @@
     <!-- Sale Summary strings -->
     <string name="sale">Total Sale: </string>
     <string name="invoice">Invoice For Sale</string>
+    <string name="decrement">Sale</string>
 </resources>

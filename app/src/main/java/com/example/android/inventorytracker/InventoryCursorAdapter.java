@@ -1,7 +1,10 @@
 package com.example.android.inventorytracker;
 
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +31,7 @@ public class InventoryCursorAdapter extends CursorAdapter {
     }
 
     // Binds the information to the view
-    public void bindView(View view, Context context, Cursor cursor) {
+    public void bindView(View view, final Context context, final Cursor cursor) {
         // Find the views in the list_item file that will house the information
         TextView nameView = (TextView) view.findViewById(R.id.item_name_view);
         final TextView quantityView = (TextView) view.findViewById(R.id.item_quantity_view);
@@ -42,19 +45,29 @@ public class InventoryCursorAdapter extends CursorAdapter {
 
         // Read the attributes from the cursor
         String itemName = cursor.getString(nameColumnIndex);
-        final String itemQuantity = cursor.getString(quantityColumnIndex);
+        String itemQuantity = cursor.getString(quantityColumnIndex);
         String itemPrice = cursor.getString(priceColumnIndex);
 
         nameView.setText(itemName);
         quantityView.setText(itemQuantity);
         priceView.setText(itemPrice);
 
+        final int rowID = cursor.getInt(cursor.getColumnIndex(InventoryEntry._ID));
+        final int tempQuanitity = Integer.parseInt(itemQuantity);
+
         decrement.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int quantity = Integer.parseInt(itemQuantity);
-                if (quantity > 0) {
-                    int newQuantity = quantity - 1;
+
+                if (tempQuanitity > 0) {
+                    int newQuantity = tempQuanitity - 1;
+
+                    ContentValues decrementValue = new ContentValues();
+                    Uri updateUri = ContentUris.withAppendedId(InventoryEntry.CONTENT_URI, rowID);
+                    decrementValue.put(InventoryEntry.COLUMN_ITEM_QUANTITY, newQuantity);
+                    context.getContentResolver().update(updateUri,
+                            decrementValue, null, null);
+
                     quantityView.setText(Integer.toString(newQuantity));
                 }
             }

@@ -92,6 +92,7 @@ public class DetailActivity extends AppCompatActivity
     private Uri mUri;
     private Bitmap mBitmap;
     public String mInvoiceSummary;
+    public String mImage;
 
     private static final String JPEG_FILE_PREFIX = "IMG_";
     private static final String JPEG_FILE_SUFFIX = ".jpg";
@@ -312,11 +313,13 @@ public class DetailActivity extends AppCompatActivity
         if (mUri != null) {
             photoPath = mUri.getPath();
             mItemImage.setTag(photoPath);
+        } else {
+            photoPath = mImage;
         }
 
         // Check to see if this is a new item
         if (mCurrentItemUri == null && TextUtils.isEmpty(name) || TextUtils.isEmpty(inStock)
-                || mDescription == InventoryEntry.UNKNOWN) {
+                || mDescription == InventoryEntry.UNKNOWN || photoPath == "") {
             Toast.makeText(this, "All Fields Must Be Filled Out", Toast.LENGTH_LONG).show();
             return;
         }
@@ -469,8 +472,8 @@ public class DetailActivity extends AppCompatActivity
             int description = cursor.getInt(descColumnIndex);
             float price = cursor.getInt(priceColumnIndex);
             int quantity = cursor.getInt(quantityColumnIndex);
-            String imageString = cursor.getString(imageColumnIndex);
-            Uri imageUri = Uri.parse("content://" + FILE_PROVIDER_AUTHORITY + imageString);
+            mImage = cursor.getString(imageColumnIndex);
+            Uri imageUri = Uri.parse("content://" + FILE_PROVIDER_AUTHORITY + mImage);
 
             // Update the views on the screen with the values from the database
             mItemEditText.setText(name);

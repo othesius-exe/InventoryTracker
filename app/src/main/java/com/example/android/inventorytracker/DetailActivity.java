@@ -252,13 +252,19 @@ public class DetailActivity extends AppCompatActivity
      * Helper method for incrementing the amount in stock
      */
     public void receiveStock() {
-        String currentStock = mInStockEditText.getText().toString();
-        String addStock = mBuySellEditText.getText().toString();
-        int currentStockInt = Integer.parseInt(currentStock);
-        int addStockInt = Integer.parseInt(addStock);
-        int newStockTotalInt = currentStockInt + addStockInt;
-        String newStockTotalString = Integer.toString(newStockTotalInt);
-        mInStockEditText.setText(newStockTotalString);
+        if (mBuySellEditText != null){
+            String currentStock = mInStockEditText.getText().toString();
+            String addStock = mBuySellEditText.getText().toString();
+            int currentStockInt = Integer.parseInt(currentStock);
+            if (!addStock.equals("")) {
+                int addStockInt = Integer.parseInt(addStock);
+                int newStockTotalInt = currentStockInt + addStockInt;
+                String newStockTotalString = Integer.toString(newStockTotalInt);
+                mInStockEditText.setText(newStockTotalString);
+            } else {
+                Toast.makeText(this, "Must enter a number to add", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     /**
